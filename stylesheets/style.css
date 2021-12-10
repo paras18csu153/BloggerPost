@@ -1,0 +1,47 @@
+*,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Nunito Sans", sans-serif;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+  background-color: rgba(245, 245, 245, 1);
+}
+
+#navbar,
+#navbar div,
+#navbar li,
+#navbar form,
+#navbar svg,
+#footer {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+#title {
+  font-family: "Smooch", cursive;
+  font-size: 2em;
+}
+
+#profile {
+  border: none;
+  outline: none;
+  background-color: rgba(255, 255, 255, 1);
+  cursor: pointer;
+}
+
+#profileIcon {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+#login {
+  background-color: #fca908;
+  color: #000000;
+  border-radius: 2em;
+  outline: none;
+  border: none;
+}
