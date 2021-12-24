@@ -31,3 +31,7 @@ function validate(input) {
 if (window.history.replaceState) {
   window.history.replaceState(null, null, window.location.href);
 }
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip({ html: true, placement: "right" });
+});

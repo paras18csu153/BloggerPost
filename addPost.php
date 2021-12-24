@@ -16,7 +16,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BloggerPost</title>
     <link rel="icon" href="./images/icon.svg" />
-    <link rel="stylesheet" href="./stylesheets/style.css" />
+    <link rel="stylesheet" href="./stylesheets/addPost.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -44,7 +44,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script src="./scripts/script.js"></script>
+    <script src="./scripts/addPost.js"></script>
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
@@ -150,27 +150,131 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
         </div>";
         }
         else{
-          echo "<div class='form-inline my-2 my-lg-0'>
-          <button class='btn btn-outline-success my-2 mr-sm-2' id='login' onclick='login()'>
-            Login
-          </button>
-        </div>";
+            echo "<script>location.href='index.php';</script>";
         }
       ?> 
       </div>
     </nav>
 
+    <div id="container">
+        <form method="POST" action="addPost.php" autocomplete="off">
+            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" maxlength="255" required>
+            <input id="tags" name="tags" type="text" placeholder="Tags (Separated by Commas)" maxlength="255" required>
+            <input id="description" name="description" type="text" placeholder="Description" maxlength="255" required>
+            <textarea id="blog" name="blog" placeholder="Blog" maxlength="65536" rows="5" required></textarea>
+            <div>
+              <button id="submit" class='btn btn-outline-success my-2 mr-sm-2' type="submit">
+                  Submit
+              </button>
+              <button id="cancel" class='btn btn-outline-danger my-2 mr-sm-2' type="button" onclick="checkForm()" data-toggle="modal" data-target="#exampleModalCenter">
+                  Cancel
+              </button>
+              <!-- Modal -->
+              <div
+                class="modal fade"
+                id="exampleModalCenter"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="exampleModalCenterTitle"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">
+                        Unsaved Changes
+                      </h5>
+                      <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                      >
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">There are some Unsaved changes. Do you want to discard the changes??</div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                      <button type="button" class="btn btn-primary" onclick="location.href='index.php'">Discard changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </form>
+    </div>
     <?php
-    if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
-        echo "<div>
-        <button id='add' onclick='redirectToAddPost()'>
-          <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
-          <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z'/>
-          </svg>
-        </button>
-      </div>";
+    if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
+        echo "<script> location.href='index.php'; </script>";
     }
-    ?>
+
+    if(isset($_POST['blogTitle'])){
+        if($_POST['blogTitle'] == ""){
+          echo "<script>alert('Blog Title cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['description'] == ""){
+          echo "<script>alert('Description cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['blog'] == ""){
+          echo "<script>alert('Blog cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['tags'] == ""){
+          echo "<script>alert('Tags cannot be empty!!');</script>";
+          die("");
+        }
+      
+        $server = "localhost";
+        $username = "root";
+        $password = "";
+
+        $con = mysqli_connect($server, $username, $password);
+
+        if(!$con){
+            die("Connection to this database failed due to ". mysqli_connect_error());
+        }
+
+        $blogTitle = $_POST['blogTitle'];
+        $tags = $_POST['tags'];
+        $blog = $_POST['blog'];
+        $description = $_POST['description'];
+
+        if(empty($blogTitle) || empty($tags) || empty($blog) || empty($description)){
+            die("Please Fill all Fields!!");
+        }
+
+        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
+        $result = $con->query($sql);
+        if($result == true){
+            // $sql = "SELECT * FROM `bloggerpost`.`users` WHERE `username`='$username'";
+            // $result = $con->query($sql);
+            // while($row = $result->fetch_assoc()) {
+                // $_SESSION["username"] = $row['username'];
+                // $_SESSION["uid"] = $row['id'];
+            // }
+            // $_SESSION['LAST_ACTIVITY']=time();
+                    echo "<script> location.href='index.php'; </script>";
+            // }
+        }
+        else{
+            echo "Error: $sql <br> $con->error";
+        }
+
+        $con->close();
+    }
+  ?>
 
     <footer class="bg-light text-center text-lg-start">
       <div id="footer" class="text-center p-3 fixed-bottom">

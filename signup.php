@@ -1,6 +1,12 @@
 <?php
 // Start the session
 session_start();
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
+  // last request was more than 30 minutes ago
+  session_unset();     // unset $_SESSION variable for the run-time 
+  session_destroy();   // destroy session data in storage
+  echo "<script> location.href='login.php'; </script>";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +34,17 @@ session_start();
       integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+      integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+      integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./scripts/signup.js"></script>
   </head>
   <body>
@@ -165,6 +182,7 @@ session_start();
           name="password"
           aria-describedby="basic-addon3"
           placeholder="Password"
+          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
           required
         />
         <div class="input-group-append">
@@ -173,6 +191,9 @@ session_start();
             class="btn btn-outline-secondary shadow-none"
             type="button"
             onclick="showPassword('password', 'hidePasswordImg', 'showPasswordImg')"
+            data-toggle="tooltip"
+            data-html="true"
+            title="<ul><li>A Password length should be of 8 characters.</li><li>A Password should contain a special character.</li><li>A Password should contain a small letter and a capital letter.</li></ul>"
           >
             <svg
               id="hidePasswordImg"
@@ -228,6 +249,7 @@ session_start();
           name="password1"
           aria-describedby="basic-addon3"
           placeholder="Confirm Password"
+          pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
           required
         />
         <div class="input-group-append">
@@ -236,6 +258,9 @@ session_start();
             class="btn btn-outline-secondary shadow-none"
             type="button"
             onclick="showPassword('password1', 'hidePasswordImg1', 'showPasswordImg1')"
+            data-toggle="tooltip"
+            data-html="true"
+            title="<ul><li>A Password length should be of 8 characters.</li><li>A Password should contain a special character.</li><li>A Password should contain a small letter and a capital letter.</li></ul>"
           >
             <svg
               id="hidePasswordImg1"
@@ -275,7 +300,7 @@ session_start();
           </button>
         </div>
       </div>
-      <p id="createAccount"><a href="#">I have an account...</a></p>
+      <p id="createAccount"><a href="login.php">I have an account...</a></p>
       <button id="submit" type="submit" class="btn btn-outline-warning">
         SignUp
       </button>
@@ -287,6 +312,41 @@ session_start();
     }
 
     if(isset($_POST['name'])){
+        if($_POST['name'] == ""){
+          echo "<script>alert('Name cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['phone'] == ""){
+          echo "<script>alert('Phone cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['email'] == ""){
+          echo "<script>alert('Email cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['username'] == ""){
+          echo "<script>alert('Username cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['password'] == ""){
+          echo "<script>alert('Password cannot be empty!!');</script>";
+          die("");
+        }
+
+        if($_POST['password1'] == ""){
+          echo "<script>alert('Confirm Password cannot be empty!!');</script>";
+          die("");
+        }
+
+        if(preg_match($_POST['password'], '(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}')){
+          echo "<script>alert('Password does not match required format!!');</script>";
+          die("");
+        }
+      
         $server = "localhost";
         $username = "root";
         $password = "";
@@ -344,6 +404,7 @@ session_start();
                 $_SESSION["username"] = $row['username'];
                 $_SESSION["uid"] = $row['id'];
             }
+            $_SESSION['LAST_ACTIVITY']=time();
             if(is_uploaded_file($_FILES['photo']['tmp_name']) == 1){
                 $name = $_POST['username'] . '.' . pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
                 $tmp_name = $_FILES['photo']['tmp_name'];

@@ -145,3 +145,7 @@ body {
   padding: 5px;
   padding-right: 0;
 }
+
+.tooltip > .tooltip-inner {
+  text-align: left;
+}
