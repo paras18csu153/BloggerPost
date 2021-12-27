@@ -1,12 +1,6 @@
 <?php
 // Start the session
 session_start();
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
-  // last request was more than 30 minutes ago
-  session_unset();     // unset $_SESSION variable for the run-time 
-  session_destroy();   // destroy session data in storage
-  echo "<script> location.href='login.php'; </script>";
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -342,7 +336,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
           die("");
         }
 
-        if(preg_match($_POST['password'], '(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}')){
+        if(!preg_match('/(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}/',$_POST['password'])){
           echo "<script>alert('Password does not match required format!!');</script>";
           die("");
         }
@@ -405,19 +399,30 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
                 $_SESSION["uid"] = $row['id'];
             }
             $_SESSION['LAST_ACTIVITY']=time();
+            $id=$_SESSION["uid"];
             if(is_uploaded_file($_FILES['photo']['tmp_name']) == 1){
                 $name = $_POST['username'] . '.' . pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
                 $tmp_name = $_FILES['photo']['tmp_name'];
                 if(move_uploaded_file($tmp_name, 'usersImage/' . $name)){
+                  $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$id',current_timestamp(), true);";
+                  $result = $con->query($sql);
+                  if($result == true){
                     echo "<script> location.href='index.php'; </script>";
+                  }
                 }
                 else{
+                  $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$id',current_timestamp(), true);";
+                  $result = $con->query($sql);
+                  if($result == true){
                     echo "<script> location.href='index.php'; </script>";
                     echo "<script> alert('Photo Not Uploaded!!'; </script>";
+                  }
                 }
             }
             else{
-                echo "<script> location.href='index.php'; </script>";
+              $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$id',current_timestamp(), true);";
+              $result = $con->query($sql);
+              echo "<script> location.href='index.php'; </script>";
             }
         }
         else{

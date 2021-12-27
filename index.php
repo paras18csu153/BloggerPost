@@ -1,11 +1,32 @@
 <?php
 // Start the session
 session_start();
+if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
   // last request was more than 30 minutes ago
   session_unset();     // unset $_SESSION variable for the run-time 
   session_destroy();   // destroy session data in storage
   echo "<script> location.href='login.php'; </script>";
+}
+else{
+  $id = $_SESSION["uid"];
+  $_SESSION['LAST_ACTIVITY'] = time();
+  $server = "localhost";
+  $username = "root";
+  $password = "";
+
+  $con = mysqli_connect($server, $username, $password);
+
+  if(!$con){
+    die("Connection to this database failed due to ". mysqli_connect_error());
+  }
+
+  $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT`=current_timestamp(), `is_online`=true WHERE `user_id`='$id'";
+  $result = $con->query($sql);
+
+  $con->close();
+}
 }
 ?>
 <!DOCTYPE html>
@@ -48,7 +69,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
-      <a id="title" class="navbar-brand" href="#">BloggerPost</a>
+      <a id="title" class="navbar-brand" href="index.php">BloggerPost</a>
       <button
         class="navbar-toggler"
         type="button"
@@ -140,8 +161,10 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
             class='dropdown-menu dropdown-menu-right'
             aria-labelledby='navbarDropdown'
           >
-            <a class='dropdown-item' href='#'>Action</a>
-            <a class='dropdown-item' href='#'>Another action</a>
+          <a class='dropdown-item' href='users.php'>Users</a>
+          <div class='dropdown-divider'></div>
+            <a class='dropdown-item' href='#'>My Articles</a>
+            <a class='dropdown-item' href='#'>My Profile</a>
             <div class='dropdown-divider'></div>
             <a id='logout' class='dropdown-item' href='logout.php'><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' class='bi bi-arrow-bar-left' viewBox='0 0 16 16'>
             <path fill-rule='evenodd' d='M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5zM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5z'/>
@@ -161,21 +184,171 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
     </nav>
 
     <?php
-    if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
-        echo "<div>
-        <button id='add' onclick='redirectToAddPost()'>
-          <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
-          <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z'/>
-          </svg>
-        </button>
-      </div>";
-    }
+      if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+          echo "<div>
+          <button id='add' onclick='redirectToAddPost()'>
+            <svg xmlns='http://www.w3.org/2000/svg' width='36' height='36' fill='currentColor' class='bi bi-plus-circle-fill' viewBox='0 0 16 16'>
+            <path d='M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z'/>
+            </svg>
+          </button>
+        </div>";
+      }
     ?>
+
+    <div id="container">
+      <?php 
+        $server = "localhost";
+        $username = "root";
+        $password = "";
+  
+        $con = mysqli_connect($server, $username, $password);
+  
+        if(!$con){
+          die("Connection to this database failed due to ". mysqli_connect_error());
+        }
+  
+        $sql = "SELECT * FROM `bloggerpost`.`blog` ORDER BY blog.date_time DESC";
+        $result = $con->query($sql);
+        if($result->num_rows!=0){
+          $i = 0;
+          while($row = $result->fetch_assoc()) {
+            $blogTitle = $row['name'];
+            $description = $row['description'];
+            $blog = $row['blog'];
+            $strlen = strlen($blog);
+            if($strlen>96){
+              $blog = substr($blog, 0, 97) . '...';
+            }
+            $id = $row['id'];
+            $date_time = $row['date_time'];
+            
+            if($i == 0){
+              echo "<h3>Recently Posted</h3>
+              <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
+                <div class='carousel-inner'>
+                  <div class='carousel-item active'>
+                    <div class='d-flex justify-content-center card-div'>
+                      <div class='card'>
+                        <div class='card-body'>
+                          <h5 class='card-title'>$blogTitle</h5>
+                          <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                          <p class='card-text'>
+                            $blog
+                          </p>
+                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                        </div>
+                      </div>";
+            }
+  
+            else if($i%4 == 0){
+              echo "</div></div><div class='carousel-item'>
+              <div class='d-flex justify-content-center card-div'>
+                <div class='card'>
+                  <div class='card-body'>
+                    <h5 class='card-title'>$blogTitle</h5>
+                    <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                    <p class='card-text'>
+                      $blog
+                    </p>
+                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                  </div>
+                </div>";
+            }
+            else{
+              echo "<div class='card'>
+              <div class='card-body'>
+                <h5 class='card-title'>$blogTitle</h5>
+                <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                <p class='card-text'>
+                  $blog
+                </p>
+                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+              </div>
+            </div>";
+            }
+  
+            $i = $i + 1;
+          }
+          echo "</div></div></div><a style='width:10%' class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev'>
+          <span class='carousel-control-prev-icon' aria-hidden='true')'></span>
+          <span class='sr-only'>Previous</span>
+        </a>
+        <a style='width:10%' class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next'>
+          <span class='carousel-control-next-icon' aria-hidden='true'></span>
+          <span class='sr-only'>Next</span>
+        </a>
+        </div>";
+          $con->close();
+        }
+      ?>
+      <!-- <h3>Recently Posted</h3>
+      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="d-flex justify-content-center card-div">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img class="d-block w-100" src="..." alt="Second slide">
+            </div>
+            <div class="carousel-item">
+              <img class="d-block w-100" src="..." alt="Third slide">
+            </div>
+          </div>
+      <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+      </div> -->
+    </div>
 
     <footer class="bg-light text-center text-lg-start">
       <div id="footer" class="text-center p-3 fixed-bottom">
         © 2021 Copyright:
-        <a class="text-dark" href="https://mdbootstrap.com/">BloggerPost.com</a>
+        <a class="text-dark" href="index.php">BloggerPost.com</a>
       </div>
       <!-- Copyright -->
     </footer>

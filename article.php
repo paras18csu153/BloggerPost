@@ -1,7 +1,8 @@
 <?php
 // Start the session
 session_start();
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
+if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+  if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
   // last request was more than 30 minutes ago
   session_unset();     // unset $_SESSION variable for the run-time 
   session_destroy();   // destroy session data in storage
@@ -24,7 +25,7 @@ else{
   $result = $con->query($sql);
 
   $con->close();
-}
+}}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +35,7 @@ else{
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BloggerPost</title>
     <link rel="icon" href="./images/icon.svg" />
-    <link rel="stylesheet" href="./stylesheets/addPost.css" />
+    <link rel="stylesheet" href="./stylesheets/article.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,7 +63,7 @@ else{
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script src="./scripts/addPost.js"></script>
+    <script src="./scripts/article.js"></script>
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
@@ -170,123 +171,104 @@ else{
         </div>";
         }
         else{
-            echo "<script>location.href='index.php';</script>";
+            echo "<div class='form-inline my-2 my-lg-0'>
+          <button class='btn btn-outline-success my-2 mr-sm-2' id='login' onclick='login()'>
+            Login
+          </button>
+        </div>";
         }
       ?> 
       </div>
     </nav>
 
     <div id="container">
-        <form method="POST" action="addPost.php" autocomplete="off">
-            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" maxlength="255" required>
-            <input id="tags" name="tags" type="text" placeholder="Tags (Separated by Commas)" maxlength="255" required>
-            <input id="description" name="description" type="text" placeholder="Description" maxlength="255" required>
-            <textarea id="blog" name="blog" placeholder="Blog" maxlength="65536" rows="5" required></textarea>
-            <div>
-              <button id="submit" class='btn btn-outline-success my-2 mr-sm-2' type="submit">
-                  Submit
-              </button>
-              <button id="cancel" class='btn btn-outline-danger my-2 mr-sm-2' type="button" onclick="checkForm()" data-toggle="modal" data-target="#exampleModalCenter">
-                  Cancel
-              </button>
-              <!-- Modal -->
-              <div
-                class="modal fade"
-                id="exampleModalCenter"
-                tabindex="-1"
-                role="dialog"
-                aria-labelledby="exampleModalCenterTitle"
-                aria-hidden="true"
-              >
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalCenterTitle">
-                        Unsaved Changes
-                      </h5>
-                      <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        <span aria-hidden="true">&times;</span>
+        <div>
+        <?php
+            if(isset($_GET['id'])){
+              $server = "localhost";
+              $username = "root";
+              $password = "";
+
+              $con = mysqli_connect($server, $username, $password);
+
+              if(!$con){
+                die("Connection to this database failed due to ". mysqli_connect_error());
+              }
+
+              $id = $_GET['id'];
+              $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `id`='$id'";
+              $result = $con->query($sql);
+              if($result->num_rows!=0){
+                while($row = $result->fetch_assoc()) {
+                  $name = $row['name'];
+                  $date_time = $row['date_time'];
+                  $blog = $row['blog'];
+                  $description = $row['description'];
+
+                  echo "<h2>$name</h2><p>$description <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+                        <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
+                      </svg> <span style='font-size: 12px; color: #707070;'>Posted on $date_time</span></p><p style='text-align: justify;'>$blog</p>";
+                }
+              }
+              else{
+                echo "<script> location.href='index.php'; </script>";
+              }
+
+              $id = $_GET['id'];
+              $sql = "SELECT * FROM `bloggerpost`.`comments` WHERE `blog_id`='$id'";
+              $result = $con->query($sql);
+              echo "<h4>Comments</h4>";
+              if($result->num_rows!=0){
+                while($row = $result->fetch_assoc()) {
+                  $comment = $row['comment'];
+                  $date_time = $row['date_time'];
+
+                  echo "<p>$comment <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+                        <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
+                      </svg> <span style='font-size: 12px; color: #707070;'>Posted on $date_time</span></p>";
+                }
+              }
+
+              if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+                echo "<form style='margin-bottom: 5%' method='POST' action='article.php?id=$id' autocomplete='off'>
+                    <textarea id='comment' name='comment' placeholder='Comment' maxlength='65536' rows='5' required></textarea>
+                    <div>
+                      <button id='submit' class='btn btn-outline-success my-2 mr-sm-2' type='submit'>
+                          Submit
+                      </button>
+                      <button id='cancel' class='btn btn-outline-danger my-2 mr-sm-2' type='reset'>
+                          Cancel
                       </button>
                     </div>
-                    <div class="modal-body">There are some Unsaved changes. Do you want to discard the changes??</div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                      >
-                        Close
-                      </button>
-                      <button type="button" class="btn btn-primary" onclick="location.href='index.php'">Discard changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </form>
+                  </form>";
+              }
+
+              if(isset($_POST['comment'])){
+                if($_POST['comment'] == ""){
+                  echo "<script>alert('Comment cannot be empty!!');</script>";
+                  die("");
+                }
+                
+                $blog_id = $_GET['id'];
+                $comment = $_POST['comment'];
+          
+                if(empty($comment)){
+                  die("Please Fill all Fields!!");
+                }
+          
+                $sql = "INSERT INTO `bloggerpost`.`comments` (`comment`, `blog_id`, `date_time`) VALUES ('$comment','$blog_id', current_timestamp());";
+                $result = $con->query($sql);
+                if($result == true){
+                  echo "<script>location.href = 'article.php?id=$id';</script>";
+                }
+                else{
+                  echo "<script> alert('Comment can't be added!!') </script>";
+                }
+              }
+              $con->close();
+            }
+        ?>
     </div>
-    <?php
-    if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
-        echo "<script> location.href='index.php'; </script>";
-    }
-
-    if(isset($_POST['blogTitle'])){
-        if($_POST['blogTitle'] == ""){
-          echo "<script>alert('Blog Title cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['description'] == ""){
-          echo "<script>alert('Description cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['blog'] == ""){
-          echo "<script>alert('Blog cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['tags'] == ""){
-          echo "<script>alert('Tags cannot be empty!!');</script>";
-          die("");
-        }
-      
-        $server = "localhost";
-        $username = "root";
-        $password = "";
-
-        $con = mysqli_connect($server, $username, $password);
-
-        if(!$con){
-            die("Connection to this database failed due to ". mysqli_connect_error());
-        }
-
-        $blogTitle = $_POST['blogTitle'];
-        $tags = $_POST['tags'];
-        $blog = $_POST['blog'];
-        $description = $_POST['description'];
-
-        if(empty($blogTitle) || empty($tags) || empty($blog) || empty($description)){
-            die("Please Fill all Fields!!");
-        }
-
-        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
-        $result = $con->query($sql);
-        if($result == true){
-          echo "<script> location.href='index.php'; </script>";
-        }
-        else{
-            echo "Error: $sql <br> $con->error";
-        }
-
-        $con->close();
-    }
-  ?>
 
     <footer class="bg-light text-center text-lg-start">
       <div id="footer" class="text-center p-3 fixed-bottom">

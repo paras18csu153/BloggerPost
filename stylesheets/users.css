@@ -38,9 +38,16 @@ body {
   background-color: rgba(255, 255, 255, 1);
 }
 
-#login {
+#login,
+#submit {
   background-color: #fca908;
   color: #000000;
+  border-radius: 2em;
+  outline: none;
+  border: none;
+}
+
+#cancel {
   border-radius: 2em;
   outline: none;
   border: none;
@@ -49,7 +56,6 @@ body {
 #add {
   float: right;
   position: absolute;
-  z-index: 999;
   bottom: 0;
   right: 0;
   outline: none;
@@ -61,30 +67,35 @@ body {
   cursor: pointer;
 }
 
+#blogLabel {
+  vertical-align: top;
+}
+
+form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
 #container {
-  padding: 20px;
-}
-
-#container .carousel-control-prev-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237f7bff' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E") !important;
-}
-
-#container .carousel-control-next-icon {
-  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%237f7bff' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E") !important;
-}
-
-h3 {
-  padding-left: 10%;
-  margin-bottom: 0;
-}
-
-.card-div {
-  width: 80%;
+  max-width: 100%;
+  padding: 34px;
   margin: auto;
 }
 
-#container .card {
-  margin: 10px;
-  margin-top: 30px;
-  max-width: 23%;
+form input,
+form textarea {
+  font-size: 16px;
+  width: 80%;
+  margin: 11px 0px;
+  padding: 7px;
+  border: 2px solid black;
+  border-radius: 6px;
+  outline: none;
+}
+
+#exampleModalCenter,
+#exampleModalCenter .modal-dialog {
+  background-color: transparent;
 }

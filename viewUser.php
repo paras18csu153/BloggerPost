@@ -24,7 +24,7 @@ else{
   $result = $con->query($sql);
 
   $con->close();
-}
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +34,7 @@ else{
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BloggerPost</title>
     <link rel="icon" href="./images/icon.svg" />
-    <link rel="stylesheet" href="./stylesheets/addPost.css" />
+    <link rel="stylesheet" href="./stylesheets/viewUser.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,7 +62,7 @@ else{
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script src="./scripts/addPost.js"></script>
+    <script src="./scripts/viewUser.js"></script>
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
@@ -177,116 +177,26 @@ else{
     </nav>
 
     <div id="container">
-        <form method="POST" action="addPost.php" autocomplete="off">
-            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" maxlength="255" required>
-            <input id="tags" name="tags" type="text" placeholder="Tags (Separated by Commas)" maxlength="255" required>
-            <input id="description" name="description" type="text" placeholder="Description" maxlength="255" required>
-            <textarea id="blog" name="blog" placeholder="Blog" maxlength="65536" rows="5" required></textarea>
-            <div>
-              <button id="submit" class='btn btn-outline-success my-2 mr-sm-2' type="submit">
-                  Submit
-              </button>
-              <button id="cancel" class='btn btn-outline-danger my-2 mr-sm-2' type="button" onclick="checkForm()" data-toggle="modal" data-target="#exampleModalCenter">
-                  Cancel
-              </button>
-              <!-- Modal -->
-              <div
-                class="modal fade"
-                id="exampleModalCenter"
-                tabindex="-1"
-                role="dialog"
-                aria-labelledby="exampleModalCenterTitle"
-                aria-hidden="true"
-              >
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalCenterTitle">
-                        Unsaved Changes
-                      </h5>
-                      <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">There are some Unsaved changes. Do you want to discard the changes??</div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                      >
-                        Close
-                      </button>
-                      <button type="button" class="btn btn-primary" onclick="location.href='index.php'">Discard changes</button>
-                    </div>
-                  </div>
+        <?php
+            $username = $_GET['username'];
+            $path = "usersImage/".$_SESSION["username"].".*";
+            $result = glob ($path); 
+            if(count($result)!=0){
+                echo "1 rows";
+            }
+            else{
+                echo "<div id='image' style='display: inline-flex;'>
+                <img style='margin-left: 10%' src='images/dummy2.svg'>
+                <div>
+                <p style='align-self:center;'>Hi</p>
+                <p style='align-self:center;'>Hi</p>
+                <p style='align-self:center;'>Hi</p>
+                <p style='align-self:center;'>Hi</p>
                 </div>
-              </div>
-            </div>
-        </form>
+                </div>";
+            }
+        ?>
     </div>
-    <?php
-    if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
-        echo "<script> location.href='index.php'; </script>";
-    }
-
-    if(isset($_POST['blogTitle'])){
-        if($_POST['blogTitle'] == ""){
-          echo "<script>alert('Blog Title cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['description'] == ""){
-          echo "<script>alert('Description cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['blog'] == ""){
-          echo "<script>alert('Blog cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['tags'] == ""){
-          echo "<script>alert('Tags cannot be empty!!');</script>";
-          die("");
-        }
-      
-        $server = "localhost";
-        $username = "root";
-        $password = "";
-
-        $con = mysqli_connect($server, $username, $password);
-
-        if(!$con){
-            die("Connection to this database failed due to ". mysqli_connect_error());
-        }
-
-        $blogTitle = $_POST['blogTitle'];
-        $tags = $_POST['tags'];
-        $blog = $_POST['blog'];
-        $description = $_POST['description'];
-
-        if(empty($blogTitle) || empty($tags) || empty($blog) || empty($description)){
-            die("Please Fill all Fields!!");
-        }
-
-        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
-        $result = $con->query($sql);
-        if($result == true){
-          echo "<script> location.href='index.php'; </script>";
-        }
-        else{
-            echo "Error: $sql <br> $con->error";
-        }
-
-        $con->close();
-    }
-  ?>
 
     <footer class="bg-light text-center text-lg-start">
       <div id="footer" class="text-center p-3 fixed-bottom">

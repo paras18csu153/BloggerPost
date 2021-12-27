@@ -1,12 +1,6 @@
 <?php
 // Start the session
 session_start();
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
-  // last request was more than 30 minutes ago
-  session_unset();     // unset $_SESSION variable for the run-time 
-  session_destroy();   // destroy session data in storage
-  echo "<script> location.href='login.php'; </script>";
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -175,7 +169,24 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
                     $_SESSION["uid"] = $row['id'];
                 }
                 $_SESSION['LAST_ACTIVITY']=time();
-                echo "<script> location.href='index.php'; </script>";
+                $id=$_SESSION["uid"];
+                $sql = "SELECT * FROM `bloggerpost`.`users_activity` WHERE `user_id`='$id'";
+                $result = $con->query($sql);
+                if($result->num_rows==0){
+                  $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$id',current_timestamp(), true);";
+                  $result = $con->query($sql);
+                  if($result == true){
+                    echo "<script> location.href='index.php'; </script>";
+                  }
+                }
+                else{
+                  $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT`=current_timestamp(), `is_online`=true WHERE `user_id`='$id'";
+                  $result = $con->query($sql);
+                  if($result == true){
+                    echo "<script> location.href='index.php'; </script>";
+                  }
+                }
+                
             };
 
             $con->close();

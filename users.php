@@ -7,24 +7,7 @@ if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 
   session_destroy();   // destroy session data in storage
   echo "<script> location.href='login.php'; </script>";
 }
-else{
-  $id = $_SESSION["uid"];
-  $_SESSION['LAST_ACTIVITY'] = time();
-  $server = "localhost";
-  $username = "root";
-  $password = "";
-
-  $con = mysqli_connect($server, $username, $password);
-
-  if(!$con){
-    die("Connection to this database failed due to ". mysqli_connect_error());
-  }
-
-  $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT`=current_timestamp(), `is_online`=true WHERE `user_id`='$id'";
-  $result = $con->query($sql);
-
-  $con->close();
-}
+echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,7 +17,7 @@ else{
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BloggerPost</title>
     <link rel="icon" href="./images/icon.svg" />
-    <link rel="stylesheet" href="./stylesheets/addPost.css" />
+    <link rel="stylesheet" href="./stylesheets/users.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -62,7 +45,7 @@ else{
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script src="./scripts/addPost.js"></script>
+    <script src="./scripts/users.js"></script>
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
@@ -177,116 +160,103 @@ else{
     </nav>
 
     <div id="container">
-        <form method="POST" action="addPost.php" autocomplete="off">
-            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" maxlength="255" required>
-            <input id="tags" name="tags" type="text" placeholder="Tags (Separated by Commas)" maxlength="255" required>
-            <input id="description" name="description" type="text" placeholder="Description" maxlength="255" required>
-            <textarea id="blog" name="blog" placeholder="Blog" maxlength="65536" rows="5" required></textarea>
-            <div>
-              <button id="submit" class='btn btn-outline-success my-2 mr-sm-2' type="submit">
-                  Submit
-              </button>
-              <button id="cancel" class='btn btn-outline-danger my-2 mr-sm-2' type="button" onclick="checkForm()" data-toggle="modal" data-target="#exampleModalCenter">
-                  Cancel
-              </button>
-              <!-- Modal -->
-              <div
-                class="modal fade"
-                id="exampleModalCenter"
-                tabindex="-1"
-                role="dialog"
-                aria-labelledby="exampleModalCenterTitle"
-                aria-hidden="true"
-              >
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalCenterTitle">
-                        Unsaved Changes
-                      </h5>
-                      <button
-                        type="button"
-                        class="close"
-                        data-dismiss="modal"
-                        aria-label="Close"
-                      >
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">There are some Unsaved changes. Do you want to discard the changes??</div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                      >
-                        Close
-                      </button>
-                      <button type="button" class="btn btn-primary" onclick="location.href='index.php'">Discard changes</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </form>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Username</th>
+            <th scope="col">Last Access At</th>
+            <th scope="col" style="text-align: center;">Offline/Online</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php 
+            $server = "localhost";
+            $username = "root";
+            $password = "";
+
+            $con = mysqli_connect($server, $username, $password);
+
+            if(!$con){
+                die("Connection to this database failed due to ". mysqli_connect_error());
+            }
+
+            $sql = "SELECT `users`.`id`, `users`.`name`, `users`.`username`, `users_activity`.`last_access_At`, `users_activity`.`is_online` FROM `bloggerpost`.`users` CROSS JOIN `bloggerpost`.`users_activity` WHERE `users`.`id`=`users_activity`.`user_id`;";
+            $result = $con->query($sql);
+            if($result->num_rows!=0){
+                while($row = $result->fetch_assoc()) {
+                    $id = $row['id'];
+                    $name = $row['name'];
+                    $username = $row['username'];
+                    $last_access_At = $row['last_access_At'];
+                    $is_online = $row['is_online'];
+                    $d = DateTime::createFromFormat('Y-m-d H:i:s', $last_access_At);
+                    $timestamp = $d->getTimestamp() - 16200;
+
+                    if($id == $_SESSION["uid"]){
+                      $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                      <circle cx='8' cy='8' r='8'/>
+                    </svg>";
+
+                    echo "<tr>
+                    <th scope='row'>$id</th>
+                    <td>$name</td>
+                    <td><a href='viewUser.php?username=$username'>$username</a></td>
+                    <td>$last_access_At</td>
+                    <td style='color: #3DED97;text-align: center;' title='Online'>$img</td>
+                  </tr>";
+                    }
+
+                    else if(!$is_online){
+                      $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                      <circle cx='8' cy='8' r='8'/>
+                    </svg>";
+                  
+                    echo "<tr>
+                    <th scope='row'>$id</th>
+                    <td>$name</td>
+                    <td><a href='viewUser.php?username=$username'>$username</a></td>
+                    <td>$last_access_At</td>
+                    <td style='color: #FF5733;text-align: center;' title='Offline'>$img</td>
+                  </tr>";
+                    }
+
+                    else if($timestamp + 300 < time()){
+                        $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                        <circle cx='8' cy='8' r='8'/>
+                      </svg>";
+                    
+                      echo "<tr>
+                      <th scope='row'>$id</th>
+                      <td>$name</td>
+                      <td><a href='viewUser.php?username=$username'>$username</a></td>
+                      <td>$last_access_At</td>
+                      <td style='color: #FF5733;text-align: center;' title='Offline'>$img</td>
+                    </tr>";
+                    }
+                    else{
+                        $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                        <circle cx='8' cy='8' r='8'/>
+                      </svg>";
+
+                      echo "<tr>
+                      <th scope='row'>$id</th>
+                      <td>$name</td>
+                      <td><a href='viewUser.php?username=$username'>$username</a></td>
+                      <td>$last_access_At</td>
+                      <td style='color: #3DED97;text-align: center;' title='Online'>$img</td>
+                    </tr>";
+                    }
+                }
+            }
+            else{
+                echo "<tr><td colspan='5' style='text-align: center; font-size: 20px;'>No Records Found!!</td></tr>";
+            }
+        ?>
+        </tbody>
+    </table>
     </div>
-    <?php
-    if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
-        echo "<script> location.href='index.php'; </script>";
-    }
-
-    if(isset($_POST['blogTitle'])){
-        if($_POST['blogTitle'] == ""){
-          echo "<script>alert('Blog Title cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['description'] == ""){
-          echo "<script>alert('Description cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['blog'] == ""){
-          echo "<script>alert('Blog cannot be empty!!');</script>";
-          die("");
-        }
-
-        if($_POST['tags'] == ""){
-          echo "<script>alert('Tags cannot be empty!!');</script>";
-          die("");
-        }
-      
-        $server = "localhost";
-        $username = "root";
-        $password = "";
-
-        $con = mysqli_connect($server, $username, $password);
-
-        if(!$con){
-            die("Connection to this database failed due to ". mysqli_connect_error());
-        }
-
-        $blogTitle = $_POST['blogTitle'];
-        $tags = $_POST['tags'];
-        $blog = $_POST['blog'];
-        $description = $_POST['description'];
-
-        if(empty($blogTitle) || empty($tags) || empty($blog) || empty($description)){
-            die("Please Fill all Fields!!");
-        }
-
-        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
-        $result = $con->query($sql);
-        if($result == true){
-          echo "<script> location.href='index.php'; </script>";
-        }
-        else{
-            echo "Error: $sql <br> $con->error";
-        }
-
-        $con->close();
-    }
-  ?>
 
     <footer class="bg-light text-center text-lg-start">
       <div id="footer" class="text-center p-3 fixed-bottom">
