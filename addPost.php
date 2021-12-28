@@ -47,11 +47,7 @@ else{
       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
       crossorigin="anonymous"
     />
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -63,6 +59,7 @@ else{
       crossorigin="anonymous"
     ></script>
     <script src="./scripts/addPost.js"></script>
+    <script src="./scripts/global.js"></script>
   </head>
   <body>
     <nav id="navbar" class="navbar navbar-expand-lg navbar-light">
@@ -126,6 +123,7 @@ else{
 
         <?php 
         if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+          $username=$_SESSION['username'];
           echo "<div class='nav-item dropdown'>
           <a
             class='nav-link'
@@ -161,7 +159,7 @@ else{
           <a class='dropdown-item' href='users.php'>Users</a>
           <div class='dropdown-divider'></div>
             <a class='dropdown-item' href='#'>My Articles</a>
-            <a class='dropdown-item' href='#'>My Profile</a>
+            <a class='dropdown-item' href='viewUser.php?username=$username'>My Profile</a>
             <div class='dropdown-divider'></div>
             <a id='logout' class='dropdown-item' href='logout.php'><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' class='bi bi-arrow-bar-left' viewBox='0 0 16 16'>
             <path fill-rule='evenodd' d='M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5zM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5z'/>
@@ -278,7 +276,17 @@ else{
         $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
         $result = $con->query($sql);
         if($result == true){
-          echo "<script> location.href='index.php'; </script>";
+          $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `name`='$blogTitle' AND `tags`='$tags' AND `blog`='$blog' AND `description` = '$description'";
+          $result = $con->query($sql);
+          while($row = $result->fetch_assoc()) {
+            $blog_id = $row['id'];
+            $user_id = $_SESSION['uid'];
+            $sql = "INSERT INTO `bloggerpost`.`user_blog_mapper` (`user_id`, `blog_id`) VALUES ('$user_id','$blog_id');";
+            $result = $con->query($sql);
+            if($result == true){
+              echo "<script> location.href='index.php'; </script>";
+            }
+          }
         }
         else{
             echo "Error: $sql <br> $con->error";

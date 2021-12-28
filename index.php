@@ -50,11 +50,7 @@ else{
       integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
       crossorigin="anonymous"
     />
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
       integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -129,7 +125,9 @@ else{
 
         <?php 
         if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
-          echo "<div class='nav-item dropdown'>
+          $username=$_SESSION['username'];
+          echo "<script src='./scripts/global.js'></script>
+          <div class='nav-item dropdown'>
           <a
             class='nav-link'
             href='#'
@@ -164,7 +162,7 @@ else{
           <a class='dropdown-item' href='users.php'>Users</a>
           <div class='dropdown-divider'></div>
             <a class='dropdown-item' href='#'>My Articles</a>
-            <a class='dropdown-item' href='#'>My Profile</a>
+            <a class='dropdown-item' href='viewUser.php?username=$username'>My Profile</a>
             <div class='dropdown-divider'></div>
             <a id='logout' class='dropdown-item' href='logout.php'><svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' class='bi bi-arrow-bar-left' viewBox='0 0 16 16'>
             <path fill-rule='evenodd' d='M12.5 15a.5.5 0 0 1-.5-.5v-13a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5zM10 8a.5.5 0 0 1-.5.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L3.707 7.5H9.5a.5.5 0 0 1 .5.5z'/>
@@ -206,7 +204,7 @@ else{
         if(!$con){
           die("Connection to this database failed due to ". mysqli_connect_error());
         }
-  
+        if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
         $sql = "SELECT * FROM `bloggerpost`.`blog` ORDER BY blog.date_time DESC";
         $result = $con->query($sql);
         if($result->num_rows!=0){
@@ -283,7 +281,379 @@ else{
         </div>";
           $con->close();
         }
+      }
+      else{
+        $sql = "SELECT `blog`.`name`, `blog`.`description`, `blog`.`blog`,`blog`.`id`, `blog`.`date_time`, `user_blog_mapper`.`user_id` FROM `bloggerpost`.`blog` CROSS JOIN `bloggerpost`.`user_blog_mapper` WHERE `blog`.`id` = `user_blog_mapper`.`blog_id` ORDER BY blog.date_time DESC";
+        $result = $con->query($sql);
+        if($result->num_rows!=0){
+          $i = 0;
+          while($row = $result->fetch_assoc()) {
+            $blogTitle = $row['name'];
+            $description = $row['description'];
+            $blog = $row['blog'];
+            $strlen = strlen($blog);
+            if($strlen>96){
+              $blog = substr($blog, 0, 97) . '...';
+            }
+            $id = $row['id'];
+            $date_time = $row['date_time'];
+            $user_id = $row['user_id'];
+            
+            if($i == 0){
+            if($user_id == $_SESSION['uid']){
+              echo "<h3>Recently Posted</h3>
+              <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
+                <div class='carousel-inner'>
+                  <div class='carousel-item active'>
+                    <div class='d-flex justify-content-center card-div'>
+                      <div class='card'>
+                        <div class='card-body'>
+                        <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
+                          </div>
+                        </div></div>
+                          <h5 class='card-title'><span>$blogTitle</span></h5>
+                          <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                          <p class='card-text'>
+                            $blog
+                          </p>
+                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                        </div>
+                      </div>";
+            }
+            else{
+              echo "<h3>Recently Posted</h3>
+              <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
+                <div class='carousel-inner'>
+                  <div class='carousel-item active'>
+                    <div class='d-flex justify-content-center card-div'>
+                      <div class='card'>
+                        <div class='card-body'>
+                        <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                          </div>
+                        </div></div>
+                          <h5 class='card-title'><span>$blogTitle</span></h5>
+                          <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                          <p class='card-text'>
+                            $blog
+                          </p>
+                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                        </div>
+                      </div>";
+            }
+            }
+  
+            else if($i%4 == 0){
+            if($user_id == $_SESSION['uid']){
+              echo "</div></div><div class='carousel-item'>
+              <div class='d-flex justify-content-center card-div'>
+                <div class='card'>
+                  <div class='card-body'>
+                  <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
+                          </div>
+                        </div></div>
+                    <h5 class='card-title'>$blogTitle</h5>
+                    <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                    <p class='card-text'>
+                      $blog
+                    </p>
+                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                  </div>
+                </div>";
+            }
+            else{
+              echo "</div></div><div class='carousel-item'>
+              <div class='d-flex justify-content-center card-div'>
+                <div class='card'>
+                  <div class='card-body'>
+                  <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                          </div>
+                        </div></div>
+                    <h5 class='card-title'>$blogTitle</h5>
+                    <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                    <p class='card-text'>
+                      $blog
+                    </p>
+                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                  </div>
+                </div>";
+            }
+            }
+            else{
+            if($user_id == $_SESSION['uid']){
+              echo "<div class='card'>
+              <div class='card-body'>
+              <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
+                          </div>
+                        </div></div>
+                <h5 class='card-title'>$blogTitle</h5>
+                <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                <p class='card-text'>
+                  $blog
+                </p>
+                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+              </div>
+            </div>";
+            }
+            else{
+              echo "<div class='card'>
+              <div class='card-body'>
+              <div class='menu' style='text-align: right;'><div class='dropdown'>
+                          <button
+                            class='btn btn-secondary'
+                            type='button'
+                            id='dropdownMenuButton'
+                            data-toggle='dropdown'
+                            aria-haspopup='true'
+                            aria-expanded='false'
+                            style='
+                              background-color: transparent;
+                              color: #000000;
+                              border: none;
+                              outline: none;
+                              box-shadow: none;
+                            '
+                          >
+                            <svg
+                              xmlns='http://www.w3.org/2000/svg'
+                              width='16'
+                              height='16'
+                              fill='currentColor'
+                              class='bi bi-three-dots'
+                              viewBox='0 0 16 16'
+                            >
+                              <path
+                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
+                              />
+                            </svg>
+                          </button>
+                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <a class='dropdown-item' href='#'>Edit</a>
+                          </div>
+                        </div></div>
+                <h5 class='card-title'>$blogTitle</h5>
+                <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
+                <p class='card-text'>
+                  $blog
+                </p>
+                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+              </div>
+            </div>";
+            }
+          }
+  
+            $i = $i + 1;
+          }
+          echo "</div></div></div><a style='width:10%' class='carousel-control-prev' href='#carouselExampleControls' role='button' data-slide='prev'>
+          <span class='carousel-control-prev-icon' aria-hidden='true')'></span>
+          <span class='sr-only'>Previous</span>
+        </a>
+        <a style='width:10%' class='carousel-control-next' href='#carouselExampleControls' role='button' data-slide='next'>
+          <span class='carousel-control-next-icon' aria-hidden='true'></span>
+          <span class='sr-only'>Next</span>
+        </a>
+        </div>";
+          $con->close();
+        }
+      }
       ?>
+<!-- Modal -->
+<div
+                class="modal fade"
+                id="exampleModalCenter"
+                tabindex="-1"
+                role="dialog"
+                aria-labelledby="exampleModalCenterTitle"
+                aria-hidden="true"
+              >
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalCenterTitle">
+                        Delete Post
+                      </h5>
+                      <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                      >
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">Are you sure you want to delete this Post??</div>
+                    <div class="modal-footer">
+                      <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal"
+                        onclick="clearCache()"
+                      >
+                        Close
+                      </button>
+                      <button type="button" class="btn btn-primary" onclick="deletePost()">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
       <!-- <h3>Recently Posted</h3>
       <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
           <div class="carousel-inner">
