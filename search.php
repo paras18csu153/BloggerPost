@@ -1,13 +1,33 @@
 <?php
 // Start the session
 session_start();
+if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+
 if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
   // last request was more than 30 minutes ago
   session_unset();     // unset $_SESSION variable for the run-time 
   session_destroy();   // destroy session data in storage
   echo "<script> location.href='login.php'; </script>";
 }
-echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
+else{
+  $id = $_SESSION["uid"];
+  $_SESSION['LAST_ACTIVITY'] = time();
+  $server = "localhost";
+  $username = "root";
+  $password = "";
+
+  $con = mysqli_connect($server, $username, $password);
+
+  if(!$con){
+    die("Connection to this database failed due to ". mysqli_connect_error());
+  }
+
+  $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT`=current_timestamp(), `is_online`=true WHERE `user_id`='$id'";
+  $result = $con->query($sql);
+
+  $con->close();
+}
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +37,7 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BloggerPost</title>
     <link rel="icon" href="./images/icon.svg" />
-    <link rel="stylesheet" href="./stylesheets/users.css" />
+    <link rel="stylesheet" href="./stylesheets/search.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -41,7 +61,7 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
       integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
       crossorigin="anonymous"
     ></script>
-    <script src="./scripts/users.js"></script>
+    <script src="./scripts/search.js"></script>
     <script src="./scripts/global.js"></script>
   </head>
   <body>
@@ -108,7 +128,8 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
         <?php 
         if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
           $username=$_SESSION['username'];
-          echo "<div class='nav-item dropdown'>
+          echo "<script src='./scripts/global.js'></script>
+          <div class='nav-item dropdown'>
           <a
             class='nav-link'
             href='#'
@@ -152,28 +173,25 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
         </div>";
         }
         else{
-            echo "<script>location.href='index.php';</script>";
+          echo "<div class='form-inline my-2 my-lg-0'>
+          <button class='btn btn-outline-success my-2 mr-sm-2' id='login' onclick='login()'>
+            Login
+          </button>
+        </div>";
         }
-      ?> 
+      ?>
       </div>
     </nav>
 
     <div id="container">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Username</th>
-            <th scope="col">Last Access At</th>
-            <th scope="col" style="text-align: center;">Offline/Online</th>
-        </tr>
-        </thead>
-        <tbody>
         <?php 
             $server = "localhost";
             $username = "root";
             $password = "";
+
+            $search = $_POST['search'];
+
+            if(isset($search) && !empty($search)){
 
             $con = mysqli_connect($server, $username, $password);
 
@@ -181,9 +199,21 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
                 die("Connection to this database failed due to ". mysqli_connect_error());
             }
 
-            $sql = "SELECT `users`.`id`, `users`.`name`, `users`.`username`, `users_activity`.`last_access_At`, `users_activity`.`is_online` FROM `bloggerpost`.`users` CROSS JOIN `bloggerpost`.`users_activity` WHERE `users`.`id`=`users_activity`.`user_id`;";
+            $sql = "SELECT `users`.`id`, `users`.`name`, `users`.`username`, `users_activity`.`last_access_At`, `users_activity`.`is_online` FROM `bloggerpost`.`users` CROSS JOIN `bloggerpost`.`users_activity` WHERE `users`.`id`=`users_activity`.`user_id` AND `users`.`username` LIKE '$search%' ORDER BY LENGTH(`users`.`username`) ,`users`.`username` ASC;";
             $result = $con->query($sql);
+
             if($result->num_rows!=0){
+                echo "<h3>Authors</h3><table class='table table-striped'>
+                <thead>
+                    <tr>
+                    <th scope='col'>#</th>
+                    <th scope='col'>Name</th>
+                    <th scope='col'>Username</th>
+                    <th scope='col'>Last Access At</th>
+                    <th scope='col' style='text-align: center;'>Offline/Online</th>
+                </tr>
+                </thead>
+                <tbody>";
                 while($row = $result->fetch_assoc()) {
                     $id = $row['id'];
                     $name = $row['name'];
@@ -193,6 +223,7 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
                     $d = DateTime::createFromFormat('Y-m-d H:i:s', $last_access_At);
                     $timestamp = $d->getTimestamp() - 16200;
 
+                    if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
                     if($id == $_SESSION["uid"]){
                       $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
                       <circle cx='8' cy='8' r='8'/>
@@ -248,13 +279,185 @@ echo "<script>setTimeout(()=>{location.href='users.php'}, 30000);</script>";
                     </tr>";
                     }
                 }
+                else{
+                      if(!$is_online){
+                        $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                        <circle cx='8' cy='8' r='8'/>
+                      </svg>";
+                    
+                      echo "<tr>
+                      <th scope='row'>$id</th>
+                      <td>$name</td>
+                      <td>$username</td>
+                      <td>$last_access_At</td>
+                      <td style='color: #FF5733;text-align: center;' title='Offline'>$img</td>
+                    </tr>";
+                      }
+  
+                      else if($timestamp + 5 < time()){
+                          $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                          <circle cx='8' cy='8' r='8'/>
+                        </svg>";
+                      
+                        echo "<tr>
+                        <th scope='row'>$id</th>
+                        <td>$name</td>
+                        <td>$username</td>
+                        <td>$last_access_At</td>
+                        <td style='color: #FF5733;text-align: center;' title='Offline'>$img</td>
+                      </tr>";
+                      }
+                      else{
+                          $img = "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-circle-fill' viewBox='0 0 16 16'>
+                          <circle cx='8' cy='8' r='8'/>
+                        </svg>";
+  
+                        echo "<tr>
+                        <th scope='row'>$id</th>
+                        <td>$name</td>
+                        <td>$username</td>
+                        <td>$last_access_At</td>
+                        <td style='color: #3DED97;text-align: center;' title='Online'>$img</td>
+                      </tr>";
+                      }
+                }
+                }
+                echo "</tbody>
+                </table>";
+            }
+
+            $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`name` LIKE '$search%' ORDER BY LENGTH(`blog`.`name`) ,`blog`.`name` ASC;";
+            $result = $con->query($sql);
+
+            if($result->num_rows!=0){
+                    if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+                        echo "<h3>Articles</h3><table class='table table-striped'>
+                <thead>
+                    <tr>
+                    <th scope='col'>#</th>
+                    <th scope='col'>Name</th>
+                    <th scope='col'>Author Name</th>
+                    <th scope='col'>Description</th>
+                    <th scope='col'>Time</th>
+                </tr>
+                </thead>
+                <tbody>";
+                while($row = $result->fetch_assoc()) {
+                    $id = $row['id'];
+                    $name = $row['name'];
+                    $username = $row['author_name'];
+                    $last_access_At = $row['date_time'];
+                    $description = $row['description'];
+
+                    echo "<tr>
+                    <th scope='row'>$id</th>
+                    <td><a href='article.php?id=$id'>$name</a></td>
+                    <td><a href='viewUser.php?username=$username'>$username</a></td>
+                    <td>$description</td>
+                    <td>$last_access_At</td>
+                  </tr>";
+                }
             }
             else{
-                echo "<tr><td colspan='5' style='text-align: center; font-size: 20px;'>No Records Found!!</td></tr>";
+                echo "<h3>Articles</h3><table class='table table-striped'>
+                <thead>
+                    <tr>
+                    <th scope='col'>#</th>
+                    <th scope='col'>Name</th>
+                    <th scope='col'>Author Name</th>
+                    <th scope='col'>Description</th>
+                    <th scope='col'>Time</th>
+                </tr>
+                </thead>
+                <tbody>";
+                while($row = $result->fetch_assoc()) {
+                    $id = $row['id'];
+                    $name = $row['name'];
+                    $username = $row['author_name'];
+                    $last_access_At = $row['date_time'];
+                    $description = $row['description'];
+
+                    echo "<tr>
+                    <th scope='row'>$id</th>
+                    <td><a href='article.php?id=$id'>$name</a></td>
+                    <td>$username</td>
+                    <td>$description</td>
+                    <td>$last_access_At</td>
+                  </tr>";
+                }
             }
+                echo "</tbody>
+                </table>";
+            }
+
+            $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`tags` LIKE '%$search%' ORDER BY LENGTH(`blog`.`name`) ,`blog`.`name` ASC;";
+            $result = $con->query($sql);
+
+            if($result->num_rows!=0){
+                if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
+                    echo "<h3>Tags</h3><table class='table table-striped'>
+            <thead>
+                <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>Name</th>
+                <th scope='col'>Author Name</th>
+                <th scope='col'>Description</th>
+                <th scope='col'>Time</th>
+            </tr>
+            </thead>
+            <tbody>";
+            while($row = $result->fetch_assoc()) {
+                $id = $row['id'];
+                $name = $row['name'];
+                $username = $row['author_name'];
+                $last_access_At = $row['date_time'];
+                $description = $row['description'];
+
+                echo "<tr>
+                <th scope='row'>$id</th>
+                <td><a href='article.php?id=$id'>$name</a></td>
+                <td><a href='viewUser.php?username=$username'>$username</a></td>
+                <td>$description</td>
+                <td>$last_access_At</td>
+              </tr>";
+            }
+        }
+        else{
+            echo "<h3>Tags</h3><table class='table table-striped'>
+            <thead>
+                <tr>
+                <th scope='col'>#</th>
+                <th scope='col'>Name</th>
+                <th scope='col'>Author Name</th>
+                <th scope='col'>Description</th>
+                <th scope='col'>Time</th>
+            </tr>
+            </thead>
+            <tbody>";
+            while($row = $result->fetch_assoc()) {
+                $id = $row['id'];
+                $name = $row['name'];
+                $username = $row['author_name'];
+                $last_access_At = $row['date_time'];
+                $description = $row['description'];
+
+                echo "<tr>
+                <th scope='row'>$id</th>
+                <td><a href='article.php?id=$id'>$name</a></td>
+                <td>$username</td>
+                <td>$description</td>
+                <td>$last_access_At</td>
+              </tr>";
+            }
+        }
+            echo "</tbody>
+            </table>";
+        }
+    }
+    else{
+        echo "<script>location.href='index.php';</script>";
+    }
         ?>
-        </tbody>
-    </table>
     </div>
 
     <footer class="bg-light text-center text-lg-start">

@@ -109,12 +109,13 @@ else{
             <a class="nav-link disabled" href="#">Disabled</a>
           </li> -->
         </ul>
-        <form class="form-inline my-2 my-lg-0">
+        <form class="form-inline my-2 my-lg-0" method='POST' action='search.php'>
           <input
             class="form-control mr-sm-2"
             type="search"
             placeholder="Search"
             aria-label="Search"
+            name="search";
           />
           <button class="btn btn-outline-success my-2 mr-sm-2" type="submit">
             Search
@@ -211,6 +212,9 @@ else{
                   $pno = $row['pno'];
                   $email = $row['email'];
                   $username = $row['username'];
+                  $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`author_name`='$username' ORDER BY `comment_count` DESC;";
+                  $result1 = $con->query($sql);
+                  $count = $result1->num_rows;
 
                   echo "<div style='padding:25px;'>
                   <div style='display: inline-flex;width: 100%;'>
@@ -225,7 +229,32 @@ else{
                   <p style='align-self:center;width: 25%;'>USERNAME:</p>
                   <p style='align-self:center;width: 25%;'><b>$username</b></p>
                   </div>
-                  </div>
+                  <div style='display: inline-flex;width: 100%;'>
+                  <p style='align-self:center;width: 25%;'>NO. OF ARTICLES POSTED:</p>
+                  <p style='align-self:center;width: 25%;'><b>$count</b></p>
+                  </div>";
+
+                  if($result1->num_rows!=0){
+                    $i = 0;
+                    echo "<h2>Popular Blogs</h2>";
+                    if($result1->num_rows > 5){
+                    while($blogs = $result1->fetch_assoc() && $i < 5){
+                      $blog_id = $blogs['id'];
+                      $blog_name = $blogs['name'];
+                      echo "<p><a href='article.php?id=$blog_id'>$blog_name</a></p>";
+                      $i = $i + 1;
+                    }
+                  }
+                  else{
+                    while($blogs = $result1->fetch_assoc()){
+                      $blog_id = $blogs['id'];
+                      $blog_name = $blogs['name'];
+                      echo "<p><a href='article.php?id=$blog_id'>$blog_name</a></p>";
+                    }
+                  }
+                  }
+
+                  echo "</div>
                   <div style='text-align: center; width: 100%;'>
                   <button id='goBack' class='btn btn-outline-success my-2 mr-sm-2' onclick='goBack()'>
                   Go Back
@@ -239,9 +268,6 @@ else{
               </button>
               </div>
                   <div style='text-align: center; width: 100%;'>
-                  <button id='editProfile' class='btn btn-outline-success my-2 mr-sm-2'>
-                  Edit Profile
-              </button>
               </div>";
                 }
             }

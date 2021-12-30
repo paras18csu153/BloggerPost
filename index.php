@@ -111,12 +111,13 @@ else{
             <a class="nav-link disabled" href="#">Disabled</a>
           </li> -->
         </ul>
-        <form class="form-inline my-2 my-lg-0">
+        <form class="form-inline my-2 my-lg-0" method='POST' action='search.php'>
           <input
             class="form-control mr-sm-2"
             type="search"
             placeholder="Search"
             aria-label="Search"
+            name="search";
           />
           <button class="btn btn-outline-success my-2 mr-sm-2" type="submit">
             Search
@@ -214,12 +215,94 @@ else{
             $description = $row['description'];
             $blog = $row['blog'];
             $strlen = strlen($blog);
+            $author_name = $row['author_name'];
             if($strlen>96){
               $blog = substr($blog, 0, 97) . '...';
             }
             $id = $row['id'];
             $date_time = $row['date_time'];
+            $d = DateTime::createFromFormat('Y-m-d H:i:s', $date_time);
+            $timestamp = $d->getTimestamp() - 16200;
             
+            if($timestamp + 300 > time()){
+              $date_time = 'Just now';
+            }
+            else if($timestamp + 600 > time()){
+              $date_time = '10 minutes ago';
+            }
+            else if($timestamp + 1200 > time()){
+              $date_time = '20 minutes ago';
+            }
+            else if($timestamp + 1800 > time()){
+              $date_time = '30 minutes ago';
+            }
+            else if($timestamp + 3600 > time()){
+              $date_time = 'an hour ago';
+            }
+            else if($timestamp + 7200 > time()){
+              $date_time = '2 hours ago';
+            }
+            else if($timestamp + 10800 > time()){
+              $date_time = '3 hours ago';
+            }
+            else if($timestamp + 14400 > time()){
+              $date_time = '4 hours ago';
+            }
+            else if($timestamp + 18000 > time()){
+              $date_time = '5 hours ago';
+            }
+            else if($timestamp + 86399 > time()){
+              $date_time = 'hours ago';
+            }
+            else if($timestamp + 864000 > time()){
+              $date_time = 'a day ago';
+            }
+            else if($timestamp + 172800 > time()){
+              $date_time = '2 days ago';
+            }
+            else if($timestamp + 259200 > time()){
+              $date_time = '3 days ago';
+            }
+            else if($timestamp + 345600 > time()){
+              $date_time = '4 days ago';
+            }
+            else if($timestamp + 432000 > time()){
+              $date_time = '5 days ago';
+            }
+            else if($timestamp + 518400 > time()){
+              $date_time = '6 days ago';
+            }
+            else if($timestamp + 604800 > time()){
+              $date_time = 'a week ago';
+            }
+            else if($timestamp + 1209600 > time()){
+              $date_time = '2 weeks ago';
+            }
+            else if($timestamp + 1814400 > time()){
+              $date_time = '3 weeks ago';
+            }
+            else if($timestamp + 2419200 > time()){
+              $date_time = '4 weeks ago';
+            }
+            else if($timestamp + 2592000 > time()){
+              $date_time = 'a month ago';
+            }
+            else if($timestamp + 5184000 > time()){
+              $date_time = '2 months ago';
+            }
+            else if($timestamp + 7776000 > time()){
+              $date_time = '3 months ago';
+            }
+            else if($timestamp + 15552000 > time()){
+              $date_time = '6 months ago';
+            }
+            else if($timestamp + 31104000 > time()){
+              $date_time = 'an year ago';
+            }
+            else{
+              $date_time = 'years ago';
+            }
+
             if($i == 0){
               echo "<h3>Recently Posted</h3>
               <div id='carouselExampleControls' class='carousel slide' data-ride='carousel'>
@@ -228,13 +311,13 @@ else{
                     <div class='d-flex justify-content-center card-div'>
                       <div class='card'>
                         <div class='card-body'>
-                          <h5 class='card-title'>$blogTitle</h5>
+                          <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By $author_name</span></h5>
                           <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                           <p class='card-text'>
                             $blog
                           </p>
-                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                          <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
                         </div>
                       </div>";
             }
@@ -244,26 +327,26 @@ else{
               <div class='d-flex justify-content-center card-div'>
                 <div class='card'>
                   <div class='card-body'>
-                    <h5 class='card-title'>$blogTitle</h5>
+                    <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By $author_name</span></h5>
                     <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                     <p class='card-text'>
                       $blog
                     </p>
-                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                    <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
                   </div>
                 </div>";
             }
             else{
               echo "<div class='card'>
               <div class='card-body'>
-                <h5 class='card-title'>$blogTitle</h5>
+                <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By $author_name</span></h5>
                 <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                 <p class='card-text'>
                   $blog
                 </p>
-                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
               </div>
             </div>";
             }
@@ -283,7 +366,7 @@ else{
         }
       }
       else{
-        $sql = "SELECT `blog`.`name`, `blog`.`description`, `blog`.`blog`,`blog`.`id`, `blog`.`date_time`, `user_blog_mapper`.`user_id` FROM `bloggerpost`.`blog` CROSS JOIN `bloggerpost`.`user_blog_mapper` WHERE `blog`.`id` = `user_blog_mapper`.`blog_id` ORDER BY blog.date_time DESC";
+        $sql = "SELECT `blog`.`name`, `blog`.`description`, `blog`.`blog`,`blog`.`id`, `blog`.`date_time`, `user_blog_mapper`.`user_id`, `blog`.`author_name` FROM `bloggerpost`.`blog` CROSS JOIN `bloggerpost`.`user_blog_mapper` WHERE `blog`.`id` = `user_blog_mapper`.`blog_id` ORDER BY blog.date_time DESC";
         $result = $con->query($sql);
         if($result->num_rows!=0){
           $i = 0;
@@ -298,6 +381,88 @@ else{
             $id = $row['id'];
             $date_time = $row['date_time'];
             $user_id = $row['user_id'];
+            $author_name = $row['author_name'];
+            $d = DateTime::createFromFormat('Y-m-d H:i:s', $date_time);
+            $timestamp = $d->getTimestamp() - 16200;
+            
+            if($timestamp + 300 > time()){
+              $date_time = 'Just now';
+            }
+            else if($timestamp + 600 > time()){
+              $date_time = '10 minutes ago';
+            }
+            else if($timestamp + 1200 > time()){
+              $date_time = '20 minutes ago';
+            }
+            else if($timestamp + 1800 > time()){
+              $date_time = '30 minutes ago';
+            }
+            else if($timestamp + 3600 > time()){
+              $date_time = 'an hour ago';
+            }
+            else if($timestamp + 7200 > time()){
+              $date_time = '2 hours ago';
+            }
+            else if($timestamp + 10800 > time()){
+              $date_time = '3 hours ago';
+            }
+            else if($timestamp + 14400 > time()){
+              $date_time = '4 hours ago';
+            }
+            else if($timestamp + 18000 > time()){
+              $date_time = '5 hours ago';
+            }
+            else if($timestamp + 86399 > time()){
+              $date_time = 'hours ago';
+            }
+            else if($timestamp + 864000 > time()){
+              $date_time = 'a day ago';
+            }
+            else if($timestamp + 172800 > time()){
+              $date_time = '2 days ago';
+            }
+            else if($timestamp + 259200 > time()){
+              $date_time = '3 days ago';
+            }
+            else if($timestamp + 345600 > time()){
+              $date_time = '4 days ago';
+            }
+            else if($timestamp + 432000 > time()){
+              $date_time = '5 days ago';
+            }
+            else if($timestamp + 518400 > time()){
+              $date_time = '6 days ago';
+            }
+            else if($timestamp + 604800 > time()){
+              $date_time = 'a week ago';
+            }
+            else if($timestamp + 1209600 > time()){
+              $date_time = '2 weeks ago';
+            }
+            else if($timestamp + 1814400 > time()){
+              $date_time = '3 weeks ago';
+            }
+            else if($timestamp + 2419200 > time()){
+              $date_time = '4 weeks ago';
+            }
+            else if($timestamp + 2592000 > time()){
+              $date_time = 'a month ago';
+            }
+            else if($timestamp + 5184000 > time()){
+              $date_time = '2 months ago';
+            }
+            else if($timestamp + 7776000 > time()){
+              $date_time = '3 months ago';
+            }
+            else if($timestamp + 15552000 > time()){
+              $date_time = '6 months ago';
+            }
+            else if($timestamp + 31104000 > time()){
+              $date_time = 'an year ago';
+            }
+            else{
+              $date_time = 'years ago';
+            }
             
             if($i == 0){
             if($user_id == $_SESSION['uid']){
@@ -308,47 +473,17 @@ else{
                     <div class='d-flex justify-content-center card-div'>
                       <div class='card'>
                         <div class='card-body'>
-                        <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
-                          </div>
-                        </div></div>
-                          <h5 class='card-title'><span>$blogTitle</span></h5>
+                          <h5 class='card-title'><span>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></span></h5>
                           <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                           <p class='card-text'>
                             $blog
                           </p>
-                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                          <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
+                          <button style='color: red;border : none; outline:none; box-shadow:none;cursor: pointer; width:100%; text-align: right;' id='$id' onclick='cache($id)'  data-toggle='modal' data-target='#exampleModalCenter'><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-trash' viewBox='0 0 16 16'>
+                      <path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z'/>
+                      <path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>
+                    </svg></button>
                         </div>
                       </div>";
             }
@@ -360,46 +495,13 @@ else{
                     <div class='d-flex justify-content-center card-div'>
                       <div class='card'>
                         <div class='card-body'>
-                        <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                          </div>
-                        </div></div>
-                          <h5 class='card-title'><span>$blogTitle</span></h5>
+                          <h5 class='card-title'><span>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></span></h5>
                           <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                           <p class='card-text'>
                             $blog
                           </p>
-                          <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                          <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                          <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                          <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
                         </div>
                       </div>";
             }
@@ -411,47 +513,17 @@ else{
               <div class='d-flex justify-content-center card-div'>
                 <div class='card'>
                   <div class='card-body'>
-                  <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
-                          </div>
-                        </div></div>
-                    <h5 class='card-title'>$blogTitle</h5>
+                    <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></h5>
                     <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                     <p class='card-text'>
                       $blog
                     </p>
-                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                    <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
+                    <button style='color: red;border : none; outline:none; box-shadow:none;cursor: pointer; width:100%; text-align: right;' id='$id' onclick='cache($id)'  data-toggle='modal' data-target='#exampleModalCenter'><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-trash' viewBox='0 0 16 16'>
+                      <path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z'/>
+                      <path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>
+                    </svg></button>
                   </div>
                 </div>";
             }
@@ -460,46 +532,13 @@ else{
               <div class='d-flex justify-content-center card-div'>
                 <div class='card'>
                   <div class='card-body'>
-                  <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                          </div>
-                        </div></div>
-                    <h5 class='card-title'>$blogTitle</h5>
+                    <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></h5>
                     <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                     <p class='card-text'>
                       $blog
                     </p>
-                    <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                    <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                    <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                    <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
                   </div>
                 </div>";
             }
@@ -508,93 +547,30 @@ else{
             if($user_id == $_SESSION['uid']){
               echo "<div class='card'>
               <div class='card-body'>
-              <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                            <a id='$id' onclick='cache($id)' class='dropdown-item' href='#' data-toggle='modal' data-target='#exampleModalCenter'>Delete</a>
-                          </div>
-                        </div></div>
-                <h5 class='card-title'>$blogTitle</h5>
+                <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></h5>
                 <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                 <p class='card-text'>
                   $blog
                 </p>
-                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
+                <button style='color: red;border : none; outline:none; box-shadow:none;cursor: pointer; width:100%; text-align: right;' id='$id' onclick='cache($id)'  data-toggle='modal' data-target='#exampleModalCenter'><svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-trash' viewBox='0 0 16 16'>
+                      <path d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z'/>
+                      <path fill-rule='evenodd' d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z'/>
+                    </svg></button>
               </div>
             </div>";
             }
             else{
               echo "<div class='card'>
               <div class='card-body'>
-              <div class='menu' style='text-align: right;'><div class='dropdown'>
-                          <button
-                            class='btn btn-secondary'
-                            type='button'
-                            id='dropdownMenuButton'
-                            data-toggle='dropdown'
-                            aria-haspopup='true'
-                            aria-expanded='false'
-                            style='
-                              background-color: transparent;
-                              color: #000000;
-                              border: none;
-                              outline: none;
-                              box-shadow: none;
-                            '
-                          >
-                            <svg
-                              xmlns='http://www.w3.org/2000/svg'
-                              width='16'
-                              height='16'
-                              fill='currentColor'
-                              class='bi bi-three-dots'
-                              viewBox='0 0 16 16'
-                            >
-                              <path
-                                d='M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z'
-                              />
-                            </svg>
-                          </button>
-                          <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <a class='dropdown-item' href='#'>Edit</a>
-                          </div>
-                        </div></div>
-                <h5 class='card-title'>$blogTitle</h5>
+                <h5 class='card-title'>$blogTitle <span style='font-size: 12px; color: #707070;'> By <a href='viewUser.php?username=$author_name'>$author_name</a></span></h5>
                 <h6 class='card-subtitle mb-2 text-muted'>$description</h6>
                 <p class='card-text'>
                   $blog
                 </p>
-                <p>ID: <a href='article.php?id=$id' class='card-link'>$id</a></p>
-                <p style='font-size: 12px; color: #707070;'>Posted on $date_time</p>
+                <p><a href='article.php?id=$id' class='card-link'>Read More...</a></p>
+                <p style='font-size: 12px; color: #707070;'>Posted $date_time</p>
               </div>
             </div>";
             }

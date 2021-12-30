@@ -1,0 +1,106 @@
+*,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Nunito Sans", sans-serif;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+  background-color: rgba(245, 245, 245, 1);
+}
+
+#navbar,
+#navbar div,
+#navbar li,
+#navbar form,
+#navbar svg,
+#footer {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+#title {
+  font-family: "Smooch", cursive;
+  font-size: 2em;
+}
+
+#profile {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background-color: rgba(255, 255, 255, 1);
+  cursor: pointer;
+}
+
+#profileIcon {
+  background-color: rgba(255, 255, 255, 1);
+}
+
+#login,
+#submit {
+  background-color: #fca908;
+  color: #000000;
+  border-radius: 2em;
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+#cancel {
+  border-radius: 2em;
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+#add {
+  float: right;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  outline: none;
+  box-shadow: none;
+  border: none;
+  background-color: transparent;
+  margin-right: 25px;
+  margin-bottom: 75px;
+  color: #000000;
+  cursor: pointer;
+}
+
+#blogLabel {
+  vertical-align: top;
+}
+
+form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+#container {
+  max-width: 100%;
+  padding: 34px;
+  margin: auto;
+}
+
+form input,
+form textarea {
+  font-size: 16px;
+  width: 80%;
+  margin: 11px 0px;
+  padding: 7px;
+  border: 2px solid black;
+  border-radius: 6px;
+  box-shadow: none;
+  outline: none;
+}
+
+#exampleModalCenter,
+#exampleModalCenter .modal-dialog {
+  background-color: transparent;
+}

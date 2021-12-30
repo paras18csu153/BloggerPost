@@ -109,12 +109,13 @@ else{
             <a class="nav-link disabled" href="#">Disabled</a>
           </li> -->
         </ul>
-        <form class="form-inline my-2 my-lg-0">
+        <form class="form-inline my-2 my-lg-0" method='POST' action='search.php'>
           <input
             class="form-control mr-sm-2"
             type="search"
             placeholder="Search"
             aria-label="Search"
+            name="search";
           />
           <button class="btn btn-outline-success my-2 mr-sm-2" type="submit">
             Search
@@ -268,12 +269,13 @@ else{
         $tags = $_POST['tags'];
         $blog = $_POST['blog'];
         $description = $_POST['description'];
+        $author_name = $_SESSION['username'];
 
         if(empty($blogTitle) || empty($tags) || empty($blog) || empty($description)){
             die("Please Fill all Fields!!");
         }
 
-        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp());";
+        $sql = "INSERT INTO `bloggerpost`.`blog` (`name`, `tags`, `description`, `blog`, `date_time`, `author_name`) VALUES ('$blogTitle','$tags','$description', '$blog', current_timestamp(), '$author_name');";
         $result = $con->query($sql);
         if($result == true){
           $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `name`='$blogTitle' AND `tags`='$tags' AND `blog`='$blog' AND `description` = '$description'";
