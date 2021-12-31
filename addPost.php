@@ -177,10 +177,10 @@ else{
 
     <div id="container">
         <form method="POST" action="addPost.php" autocomplete="off">
-            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" maxlength="255" required>
+            <input id="blogTitle" name="blogTitle" type="text" placeholder="Title" minlength="15" maxlength="50" required>
             <input id="tags" name="tags" type="text" placeholder="Tags (Separated by Commas)" maxlength="255" required>
-            <input id="description" name="description" type="text" placeholder="Description" maxlength="255" required>
-            <textarea id="blog" name="blog" placeholder="Blog" maxlength="65536" rows="5" required></textarea>
+            <input id="description" name="description" type="text" placeholder="Description" minlength="15" maxlength="100" required>
+            <textarea id="blog" name="blog" placeholder="Blog" minlength="50" maxlength="65535" rows="5" required></textarea>
             <div>
               <button id="submit" class='btn btn-outline-success my-2 mr-sm-2' type="submit">
                   Submit
@@ -240,8 +240,18 @@ else{
           die("");
         }
 
+        if(strlen($_POST['blogTitle']) < 15 || strlen($_POST['blogTitle']) > 50){
+          echo "<script>alert('Blog Title should be of length greater than 15 characters and less than 50 characters!!');</script>";
+          die("");
+        }
+
         if($_POST['description'] == ""){
           echo "<script>alert('Description cannot be empty!!');</script>";
+          die("");
+        }
+
+        if(strlen($_POST['description']) < 15 || strlen($_POST['blogTitle']) > 100){
+          echo "<script>alert('Description should be of length greater than 15 characters and less than 100 characters!!');</script>";
           die("");
         }
 
@@ -250,8 +260,18 @@ else{
           die("");
         }
 
+        if(strlen($_POST['blog']) < 50 || strlen($_POST['blog']) > 65535){
+          echo "<script>alert('Blog should be of length greater than 50 characters and less than 65535 characters!!');</script>";
+          die("");
+        }
+
         if($_POST['tags'] == ""){
           echo "<script>alert('Tags cannot be empty!!');</script>";
+          die("");
+        }
+
+        if(strlen($_POST['tags']) > 255){
+          echo "<script>alert('Tags should be of length less than 255 characters!!');</script>";
           die("");
         }
       

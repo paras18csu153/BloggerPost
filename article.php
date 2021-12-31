@@ -1,5 +1,6 @@
 <?php
 // Start the session
+include 'createdate.php';
 session_start();
 if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
   if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 1800)) {
@@ -202,103 +203,22 @@ else{
                   $name = $row['name'];
                   $date_time = $row['date_time'];
                   $blog = $row['blog'];
-                  $comment_count = $row['comment_count'];
                   $description = $row['description'];
                   $author_name = $row['author_name'];
                   $d = DateTime::createFromFormat('Y-m-d H:i:s', $date_time);
             $timestamp = $d->getTimestamp() - 16200;
             
-            if($timestamp + 300 > time()){
-              $date_time = 'Just now';
-            }
-            else if($timestamp + 600 > time()){
-              $date_time = '10 minutes ago';
-            }
-            else if($timestamp + 1200 > time()){
-              $date_time = '20 minutes ago';
-            }
-            else if($timestamp + 1800 > time()){
-              $date_time = '30 minutes ago';
-            }
-            else if($timestamp + 3600 > time()){
-              $date_time = 'an hour ago';
-            }
-            else if($timestamp + 7200 > time()){
-              $date_time = '2 hours ago';
-            }
-            else if($timestamp + 10800 > time()){
-              $date_time = '3 hours ago';
-            }
-            else if($timestamp + 14400 > time()){
-              $date_time = '4 hours ago';
-            }
-            else if($timestamp + 18000 > time()){
-              $date_time = '5 hours ago';
-            }
-            else if($timestamp + 86399 > time()){
-              $date_time = 'hours ago';
-            }
-            else if($timestamp + 864000 > time()){
-              $date_time = 'a day ago';
-            }
-            else if($timestamp + 172800 > time()){
-              $date_time = '2 days ago';
-            }
-            else if($timestamp + 259200 > time()){
-              $date_time = '3 days ago';
-            }
-            else if($timestamp + 345600 > time()){
-              $date_time = '4 days ago';
-            }
-            else if($timestamp + 432000 > time()){
-              $date_time = '5 days ago';
-            }
-            else if($timestamp + 518400 > time()){
-              $date_time = '6 days ago';
-            }
-            else if($timestamp + 604800 > time()){
-              $date_time = 'a week ago';
-            }
-            else if($timestamp + 1209600 > time()){
-              $date_time = '2 weeks ago';
-            }
-            else if($timestamp + 1814400 > time()){
-              $date_time = '3 weeks ago';
-            }
-            else if($timestamp + 2419200 > time()){
-              $date_time = '4 weeks ago';
-            }
-            else if($timestamp + 2592000 > time()){
-              $date_time = 'a month ago';
-            }
-            else if($timestamp + 5184000 > time()){
-              $date_time = '2 months ago';
-            }
-            else if($timestamp + 7776000 > time()){
-              $date_time = '3 months ago';
-            }
-            else if($timestamp + 15552000 > time()){
-              $date_time = '6 months ago';
-            }
-            else if($timestamp + 31104000 > time()){
-              $date_time = 'an year ago';
-            }
-            else{
-              $date_time = 'years ago';
-            }
+            $date_time = secondsToTime(time() - $timestamp);
+
             if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
-                  echo "<h2>$name<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
-                  <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
-                </svg><span style='font-size: 12px; color: #707070;vertical-align:middle;'>By <a href='viewUser.php?username=$author_name'>$author_name</a></span></h2><p>$description <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+                  echo "<h2>$name</h2><p>$description <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
                         <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
-                      </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time</span></p><p style='text-align: justify;'>$blog</p>";
+                      </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time by <a href='viewUser.php?username=$author_name'><b>$author_name</b></a></span></p><p style='text-align: justify;'>$blog</p>";
                 }
                 else{
-                  echo "<h2>$name<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
-                  <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
-                </svg><span style='font-size: 12px; color: #707070;vertical-align:middle;'>By $author_name</span></h2><p>$description <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+                  echo "<h2>$name</h2><p>$description <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
                         <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
-                      </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time</span></p><p style='text-align: justify;'>$blog</p>";
+                      </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time by $author_name</span></p><p style='text-align: justify;'>$blog</p>";
                 }
               }
               }
@@ -307,7 +227,7 @@ else{
               }
 
               $id = $_GET['id'];
-              $sql = "SELECT * FROM `bloggerpost`.`comments` WHERE `blog_id`='$id'";
+              $sql = "SELECT * FROM `bloggerpost`.`comments` WHERE `blog_id`='$id' ORDER BY `date_time` DESC";
               $result = $con->query($sql);
               if($result->num_rows!=0){
                 echo "<h4>Comments</h4>";
@@ -318,91 +238,15 @@ else{
                   $d = DateTime::createFromFormat('Y-m-d H:i:s', $date_time);
             $timestamp = $d->getTimestamp() - 16200;
             
-            if($timestamp + 300 > time()){
-              $date_time = 'Just now';
-            }
-            else if($timestamp + 600 > time()){
-              $date_time = '10 minutes ago';
-            }
-            else if($timestamp + 1200 > time()){
-              $date_time = '20 minutes ago';
-            }
-            else if($timestamp + 1800 > time()){
-              $date_time = '30 minutes ago';
-            }
-            else if($timestamp + 3600 > time()){
-              $date_time = 'an hour ago';
-            }
-            else if($timestamp + 7200 > time()){
-              $date_time = '2 hours ago';
-            }
-            else if($timestamp + 10800 > time()){
-              $date_time = '3 hours ago';
-            }
-            else if($timestamp + 14400 > time()){
-              $date_time = '4 hours ago';
-            }
-            else if($timestamp + 18000 > time()){
-              $date_time = '5 hours ago';
-            }
-            else if($timestamp + 86399 > time()){
-              $date_time = 'hours ago';
-            }
-            else if($timestamp + 864000 > time()){
-              $date_time = 'a day ago';
-            }
-            else if($timestamp + 172800 > time()){
-              $date_time = '2 days ago';
-            }
-            else if($timestamp + 259200 > time()){
-              $date_time = '3 days ago';
-            }
-            else if($timestamp + 345600 > time()){
-              $date_time = '4 days ago';
-            }
-            else if($timestamp + 432000 > time()){
-              $date_time = '5 days ago';
-            }
-            else if($timestamp + 518400 > time()){
-              $date_time = '6 days ago';
-            }
-            else if($timestamp + 604800 > time()){
-              $date_time = 'a week ago';
-            }
-            else if($timestamp + 1209600 > time()){
-              $date_time = '2 weeks ago';
-            }
-            else if($timestamp + 1814400 > time()){
-              $date_time = '3 weeks ago';
-            }
-            else if($timestamp + 2419200 > time()){
-              $date_time = '4 weeks ago';
-            }
-            else if($timestamp + 2592000 > time()){
-              $date_time = 'a month ago';
-            }
-            else if($timestamp + 5184000 > time()){
-              $date_time = '2 months ago';
-            }
-            else if($timestamp + 7776000 > time()){
-              $date_time = '3 months ago';
-            }
-            else if($timestamp + 15552000 > time()){
-              $date_time = '6 months ago';
-            }
-            else if($timestamp + 31104000 > time()){
-              $date_time = 'an year ago';
-            }
-            else{
-              $date_time = 'years ago';
-            }
+            $date_time = secondsToTime(time() - $timestamp);
+
             if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
-              echo "<p><a href='viewUser.php?username=$comment_by_username'>$comment_by_username</a> - $comment <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+              echo "<p style='margin-bottom: 0px;'><a href='viewUser.php?username=$comment_by_username'>$comment_by_username</a></p><p>$comment <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
                     <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
                   </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time</span></p>";
             }    
             else{
-                  echo "<p>$comment_by_username - $comment <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
+                  echo "<p style='margin-bottom: 0px;'>$comment_by_username</p><p>$comment <svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dot' viewBox='0 0 16 16'>
                         <path d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'/>
                       </svg> <span style='font-size: 12px; color: #707070;'>Posted $date_time</span></p>";
                 }
@@ -411,7 +255,7 @@ else{
 
               if(isset($_SESSION['username']) || !empty($_SESSION['username'])){
                 echo "<form style='margin-bottom: 5%' method='POST' action='article.php?id=$id' autocomplete='off'>
-                    <textarea id='comment' name='comment' placeholder='Comment' maxlength='65536' rows='5' required></textarea>
+                    <textarea id='comment' name='comment' placeholder='Comment' minlength='15' maxlength='255' rows='5' required></textarea>
                     <div>
                       <button id='submit' class='btn btn-outline-success my-2 mr-sm-2' type='submit'>
                           Submit
@@ -429,6 +273,11 @@ else{
                   die("");
                 }
                 
+                if(strlen($_POST['comment']) < 15 || strlen($_POST['comment']) > 255){
+                  echo "<script>alert('Comment should be of length greater than 15 characters and less than 255 characters!!');</script>";
+                  die("");
+                }
+
                 $blog_id = $_GET['id'];
                 $comment = $_POST['comment'];
                 $username = $_SESSION['username'];
@@ -440,9 +289,6 @@ else{
                 $sql = "INSERT INTO `bloggerpost`.`comments` (`comment`, `blog_id`, `date_time`, `comment_by_username`) VALUES ('$comment','$blog_id', current_timestamp(), '$username');";
                 $result = $con->query($sql);
                 if($result == true){
-                  $comment_count = $comment_count + 1;
-                  $sql = "UPDATE `bloggerpost`.`blog` SET `comment_count`='$comment_count' WHERE `blog`.`id`='$blog_id'";
-                $result = $con->query($sql);
                 echo "<script>location.href = 'article.php?id=$id';</script>";
                 }
                 else{

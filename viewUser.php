@@ -212,9 +212,22 @@ else{
                   $pno = $row['pno'];
                   $email = $row['email'];
                   $username = $row['username'];
-                  $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`author_name`='$username' ORDER BY `comment_count` DESC;";
+                  $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`author_name`='$username';";
                   $result1 = $con->query($sql);
                   $count = $result1->num_rows;
+                  $associativeArray = array();
+
+                  while($row = $result1->fetch_assoc()){
+                    $blog_id = $row['id'];
+                    $blog_name = $row['name'];
+                    $sql = "SELECT * FROM `bloggerpost`.`comments` WHERE `comments`.`blog_id`='$blog_id';";
+                    $comments = $con->query($sql);
+                    $num_comments = $comments->num_rows;
+                    $associativeArray[$blog_name] = $num_comments;
+                  }
+
+                  arsort($associativeArray);
+                  $articleNames = array_keys($associativeArray);
 
                   echo "<div style='padding:25px;'>
                   <div style='display: inline-flex;width: 100%;'>
@@ -234,22 +247,26 @@ else{
                   <p style='align-self:center;width: 25%;'><b>$count</b></p>
                   </div>";
 
-                  if($result1->num_rows!=0){
-                    $i = 0;
-                    echo "<h2>Popular Blogs</h2>";
-                    if($result1->num_rows > 5){
-                    while($blogs = $result1->fetch_assoc() && $i < 5){
-                      $blog_id = $blogs['id'];
-                      $blog_name = $blogs['name'];
-                      echo "<p><a href='article.php?id=$blog_id'>$blog_name</a></p>";
-                      $i = $i + 1;
+                  if(count($articleNames)!=0){
+                    echo "<h2 style='margin-top: 20px;'>Popular Blogs</h2>";
+                    if(count($articleNames) > 5){
+                      for($i = 0; $i<5; $i++){
+                        $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`name`='$articleNames[$i]';";
+                        $result1 = $con->query($sql);
+                        while($row = $result1->fetch_assoc()){
+                          $id = $row['id'];
+                          echo "<p><a href='article.php?id=$id'>$articleNames[$i]</a></p>";
+                        }
                     }
                   }
                   else{
-                    while($blogs = $result1->fetch_assoc()){
-                      $blog_id = $blogs['id'];
-                      $blog_name = $blogs['name'];
-                      echo "<p><a href='article.php?id=$blog_id'>$blog_name</a></p>";
+                    for($i = 0; $i<count($articleNames); $i++){
+                      $sql = "SELECT * FROM `bloggerpost`.`blog` WHERE `blog`.`name`='$articleNames[$i]';";
+                      $result1 = $con->query($sql);
+                      while($row = $result1->fetch_assoc()){
+                        $id = $row['id'];
+                        echo "<p><a href='article.php?id=$id'>$articleNames[$i]</a></p>";
+                      }
                     }
                   }
                   }
