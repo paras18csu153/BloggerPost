@@ -232,6 +232,7 @@ else{
     <?php
     if(!isset($_SESSION['username']) || empty($_SESSION['username'])){
         echo "<script> location.href='index.php'; </script>";
+        die("");
     }
 
     if(isset($_POST['blogTitle'])){

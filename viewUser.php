@@ -288,6 +288,9 @@ else{
               </div>";
                 }
             }
+            else{
+              echo "<script> location.href='login.php'; </script>";
+            }
         ?>
     </div>
 
