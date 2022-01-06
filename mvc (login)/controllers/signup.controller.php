@@ -67,7 +67,7 @@ if(isset($_POST['name'])){
     $user->setName($name);
     $user->setPno($pno);
     $user->setEmail($email);
-    $user->setPassword($password);
+    $user->setPassword($hashed_password);
         
     $result = $user->get_By_Username();
     

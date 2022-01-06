@@ -59,7 +59,7 @@
 	}
 
     function insert_User(){
-        $sql = "INSERT INTO `bloggerpost`.`users` (`name`, `pno`, `username`, `email`, `password`) VALUES ('$this->name,'$this->pno','$this->username','$this->email','$this->password')";
+        $sql = "INSERT INTO `bloggerpost`.`users` (`name`, `pno`, `username`, `email`, `password`) VALUES ('$this->name','$this->pno','$this->username','$this->email','$this->password')";
         return runQuery($sql);
     }
 
