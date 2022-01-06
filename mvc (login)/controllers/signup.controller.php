@@ -63,30 +63,36 @@ if(isset($_POST['name'])){
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     $user = new User();
-    $result = $user->get_By_Username($username);
+    $user->setUsername($username);
+    $user->setName($name);
+    $user->setPno($pno);
+    $user->setEmail($email);
+    $user->setPassword($password);
+        
+    $result = $user->get_By_Username();
     
     if($result->num_rows!=0){
         die("User already exists with same username!!");
     }
 
-    $result = $user->get_By_Email($email);
+    $result = $user->get_By_Email();
 
     if($result->num_rows!=0){
         $con->close();
         die("User already exists with same email!!");
     }
 
-    $result = $user->get_By_Pno($pno);
+    $result = $user->get_By_Pno();
 
     if($result->num_rows!=0){
         $con->close();
         die("User already exists with same phone number!!");
     }
 
-    $result = $user->insert_User($name, $pno, $username, $email, $hashed_password);
+    $result = $user->insert_User();
 
     if($result == true){
-        $result = $user->get_By_Username($username);
+        $result = $user->get_By_Username();
 
         while($row = $result->fetch_assoc()) {
             $_SESSION["username"] = $row['username'];
@@ -96,20 +102,21 @@ if(isset($_POST['name'])){
         $_SESSION['LAST_ACTIVITY']=time();
         $id=$_SESSION["uid"];
         $user_activity = new User_Activity();
+        $user_activity->setUser_id($id);
         
         if(is_uploaded_file($_FILES['photo']['tmp_name']) == 1){
             $name = $_POST['username'] . '.' . pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
             $tmp_name = $_FILES['photo']['tmp_name'];
             
             if(move_uploaded_file($tmp_name, 'usersImage/' . $name)){
-                $result = $user_activity->insert_user_activity($id);
+                $result = $user_activity->insert_user_activity();
                 if($result == true){
                     echo "User Created and Photo Uploaded Successfully!!";
                 }
             }
             
             else{
-                $result = $user_activity->insert_user_activity($id);
+                $result = $user_activity->insert_user_activity();
               
                 if($result == true){
                     echo "User Created and Photo not uploaded!!";
@@ -118,7 +125,7 @@ if(isset($_POST['name'])){
         }
 
         else{
-          $result = $user_activity->insert_user_activity($id);
+          $result = $user_activity->insert_user_activity();
           echo "User Created Successfully!!";
         }
     }

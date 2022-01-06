@@ -27,14 +27,15 @@
         $password = $_POST['password'];
 
         $user = new User();
-        $result = $user->get_By_Username($username);
+        $user->setUsername($username);
+        $result = $user->get_By_Username();
         
         if($result->num_rows==0){
             die("User doesn't exist!!");
         }
 
         if(password_verify($password, mysqli_fetch_array( $result )['password'])){
-            $result = $user->get_By_Username($username);
+            $result = $user->get_By_Username();
             while($row = $result->fetch_assoc()) {
                 $_SESSION["username"] = $row['username'];
                 $_SESSION["uid"] = $row['id'];
@@ -44,17 +45,18 @@
             $id = $_SESSION["uid"];
 
             $user_activity = new User_Activity();
-            $result = $user_activity->get_By_UserID($id);
+            $user_activity->setUser_id($id);
+            $result = $user_activity->get_By_UserID();
             
             if($result->num_rows == 0){
-                $result = $user_activity->insert_user_activity($id);
+                $result = $user_activity->insert_user_activity();
                 if($result == true){
                     echo "Logged in Successfully!!";
                 }
             }
 
             else{
-                $result = $user_activity->update_user_activity($id);
+                $result = $user_activity->update_user_activity();
                 if($result == true){
                     echo "Logged in Successfully!!";
                 }
