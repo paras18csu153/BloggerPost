@@ -10,7 +10,7 @@
     private $email;
     private $password;
 
-    function getId() {
+	function getId() {
 		return $this->id;
 	}
 
@@ -18,15 +18,15 @@
 		$this->id = $id;
 	}
 
-    function getName() {
+	function getName() {
 		return $this->name;
 	}
 
-    function setName($name) {
+	function setName($name) {
 		$this->name = $name;
 	}
 
-    function getUsername() {
+	function getUsername() {
 		return $this->username;
 	}
 
@@ -58,24 +58,24 @@
 		$this->password = $password;
 	}
 
-    function insert_User(){
-        $sql = "INSERT INTO `bloggerpost`.`users` (`name`, `pno`, `username`, `email`, `password`) VALUES ('$this->name','$this->pno','$this->username','$this->email','$this->password')";
-        return runQuery($sql);
-    }
+	function insert_User(){
+		$sql = "INSERT INTO `bloggerpost`.`users` (`name`, `pno`, `username`, `email`, `password`) VALUES ('$this->name','$this->pno','$this->username','$this->email','$this->password')";
+		return runQuery($sql);
+	}
 
-    function get_By_Username(){
-        $sql = "SELECT * FROM `bloggerpost`.`users` WHERE `username`='$this->username'";
-        return runQuery($sql);
-    }
+	function get_By_Username(){
+		$sql = "SELECT * FROM `bloggerpost`.`users` WHERE `username`='$this->username'";
+		return runQuery($sql);
+	}
 
-    function get_By_Email(){
-        $sql = "SELECT * FROM `bloggerpost`.`users` WHERE `email`='$this->email'";
-        return runQuery($sql);
-    }
+	function get_By_Email(){
+		$sql = "SELECT * FROM `bloggerpost`.`users` WHERE `email`='$this->email'";
+		return runQuery($sql);
+	}
 
-    function get_By_Pno(){
-        $sql = "SELECT * FROM `bloggerpost`.`users` WHERE `pno`='$this->pno'";
-        return runQuery($sql);
-    }
+	function get_By_Pno(){
+		$sql = "SELECT * FROM `bloggerpost`.`users` WHERE `pno`='$this->pno'";
+		return runQuery($sql);
+	}
  }
 ?>
