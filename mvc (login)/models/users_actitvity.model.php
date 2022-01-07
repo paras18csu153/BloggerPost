@@ -9,7 +9,7 @@
     private $last_access_at;
     private $is_online;
 
-    function getId() {
+	function getId() {
 		return $this->id;
 	}
 
@@ -41,22 +41,22 @@
 		$this->is_online = $is_online;
 	}
 
-    function get_By_UserID(){
+	function get_By_UserID(){
 		$this->user_id = $this->getUser_id();
-        $sql = "SELECT * FROM `bloggerpost`.`users_activity` WHERE `user_id`='$this->user_id'";
-        return runQuery($sql);
-    }
+		$sql = "SELECT * FROM `bloggerpost`.`users_activity` WHERE `user_id`='$this->user_id'";
+		return runQuery($sql);
+	}
 
-    function insert_user_activity(){
+	function insert_user_activity(){
 		$this->user_id = $this->getUser_id();
-        $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$this->user_id',current_timestamp(), true);";
-        return runQuery($sql);
-    }
+		$sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$this->user_id',current_timestamp(), true);";
+		return runQuery($sql);
+	}
 
-    function update_user_activity(){
+	function update_user_activity(){
 		$this->user_id = $this->getUser_id();
-        $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT` = current_timestamp(), `is_online` = true WHERE `user_id` = '$this->user_id'";
-        return runQuery($sql);
-    }
+		$sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT` = current_timestamp(), `is_online` = true WHERE `user_id` = '$this->user_id'";
+		return runQuery($sql);
+	}
  }
 ?>
