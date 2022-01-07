@@ -1,6 +1,7 @@
 <?php 
  include_once '../routes/router.php';
  include_once $runQuery;
+ include_once $user_model;
 
  class User_Activity extends User{
     private $id;
@@ -21,7 +22,7 @@
 	}
 
 	function setUser_id($user_id) {
-		return parent::setId($user_id);
+		parent::setId($user_id);
 	}
 
 	function getLast_access_at() {
@@ -41,16 +42,19 @@
 	}
 
     function get_By_UserID(){
-        $sql = "SELECT * FROM `bloggerpost`.`users_activity` WHERE `user_id`='$this->id'";
+		$this->user_id = $this->getUser_id();
+        $sql = "SELECT * FROM `bloggerpost`.`users_activity` WHERE `user_id`='$this->user_id'";
         return runQuery($sql);
     }
 
     function insert_user_activity(){
+		$this->user_id = $this->getUser_id();
         $sql = "INSERT INTO `bloggerpost`.`users_activity` (`user_id`, `last_access_At`, `is_online`) VALUES ('$this->user_id',current_timestamp(), true);";
         return runQuery($sql);
     }
 
     function update_user_activity(){
+		$this->user_id = $this->getUser_id();
         $sql = "UPDATE `bloggerpost`.`users_activity` SET `last_access_AT` = current_timestamp(), `is_online` = true WHERE `user_id` = '$this->user_id'";
         return runQuery($sql);
     }
